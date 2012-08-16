@@ -18,3 +18,5 @@ Debug/
 CefSharp/app.aps
 TestResult.xml
 debug.log
+*.opensdf
+*.sdf

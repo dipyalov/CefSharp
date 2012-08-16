@@ -327,14 +327,16 @@ namespace WinForms
         ConsoleMessage(this, gcnew ConsoleMessageEventArgs(message, source, line));
     }
 
-    void WebView::OnFrameLoadStart()
+    void WebView::OnFrameLoadStart(String^ url)
     {
         _browserCore->OnFrameLoadStart();
     }
 
-    void WebView::OnFrameLoadEnd()
+    void WebView::OnFrameLoadEnd(String^ url)
     {
-        _browserCore->OnFrameLoadEnd();
+		_browserCore->OnFrameLoadEnd();
+		
+		LoadCompleted(this, gcnew LoadCompletedEventArgs(url));		
     }
 
     void WebView::OnTakeFocus(bool next)
