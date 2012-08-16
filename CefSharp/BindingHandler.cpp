@@ -259,7 +259,7 @@ namespace CefSharp
         IDictionary<String^, Object^>^ methodNames = gcnew Dictionary<String^, Object^>();
         for each(MethodInfo^ method in methods) 
         {
-            methodNames->Add(method->Name, nullptr);
+            methodNames[method->Name] = nullptr;
         }
 
         // create a corresponding javascript method for each c# method
