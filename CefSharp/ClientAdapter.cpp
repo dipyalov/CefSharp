@@ -221,15 +221,44 @@ namespace CefSharp
 
     void ClientAdapter::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context)
     {
+		CefV8Context* contextPtr = context.get();
+		contextPtr->AddRef();
+		IntPtr ptr(contextPtr);
+
+		Dictionary<Object^, IntPtr>^ bindings;
+		if (!_contextBindings->TryGetValue(ptr, bindings))
+		{		
+			_contextBindings->default[ptr] = bindings = gcnew Dictionary<Object^, IntPtr>();
+		}
+
         for each(KeyValuePair<String^, Object^>^ kvp in CEF::GetBoundObjects())
         {
-            BindingHandler::Bind(kvp->Key, kvp->Value, context->GetGlobal());
+            BindingHandler::BindCached(kvp->Key, kvp->Value, context->GetGlobal(), bindings);
         }
 
         for each(KeyValuePair<String^, Object^>^ kvp in _browserControl->GetBoundObjects())
         {
-            BindingHandler::Bind(kvp->Key, kvp->Value, context->GetGlobal());
+            BindingHandler::BindCached(kvp->Key, kvp->Value, context->GetGlobal(), bindings);
         }
+    }
+
+	void ClientAdapter::OnContextReleased(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context)
+    {
+		CefV8Context *contextPtr = context.get();
+		IntPtr ptr(contextPtr);
+
+		Dictionary<Object^, IntPtr>^ bindings;
+		if (_contextBindings->TryGetValue(ptr, bindings))
+		{
+			_contextBindings->Remove(ptr);
+			contextPtr->Release();
+
+			for each (KeyValuePair<Object^, IntPtr> p in bindings)
+			{
+				((CefV8Value*)p.Value.ToPointer())->Release();
+			}
+			bindings->Clear();
+		}
     }
 
     bool ClientAdapter::OnBeforeMenu(CefRefPtr<CefBrowser> browser, const CefMenuInfo& menuInfo)

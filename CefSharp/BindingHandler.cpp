@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "BindingHandler.h"
+#include "ScriptingObjectAttribute.h"
 
 namespace CefSharp
 {
@@ -124,6 +125,36 @@ namespace CefSharp
         return Convert::ChangeType(value, conversionType);
     }
 
+
+	CefRefPtr<CefV8Value> BindingHandler::ConvertToCefWithScripting(Object^ obj, Type^ type, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache)
+    {
+        CefRefPtr<CefV8Value> result;
+		if (tryConvertToCef(obj, type, result))
+		{
+			return result;
+		}       
+
+		if (cache != nullptr)
+		{
+			IntPtr ptr;
+			if (cache->TryGetValue(obj, ptr))
+			{
+				return CefRefPtr<CefV8Value>((CefV8Value*)ptr.ToPointer());
+			}
+
+			if (obj->GetType()->GetCustomAttributes(ScriptingObjectAttribute::typeid, true).Length > 0)
+			{
+				CefRefPtr<CefV8Value> value = ResolveCefObject(obj, window, cache);
+				CefV8Value *valuePtr = value.get();
+				valuePtr->AddRef();
+				cache[obj] = IntPtr(valuePtr);
+				return value;
+			}
+		}
+
+        throw gcnew Exception("Cannot convert object from CLR to Cef " + type->ToString() + ".");
+    }
+
     bool BindingHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception)
     {
         CefRefPtr<BindingData> bindingData = static_cast<BindingData*>(object->GetUserData().get());
@@ -225,7 +256,7 @@ namespace CefSharp
             try
             {
                 Object^ result = bestMethod->Invoke(self, bestMethodArguments);
-                retval = convertToCef(result, bestMethod->ReturnType);
+                retval = ConvertToCefWithScripting(result, bestMethod->ReturnType, object,  _objectCache);
                 return true;
             }
             catch(System::Reflection::TargetInvocationException^ err)
@@ -242,6 +273,41 @@ namespace CefSharp
             exception = toNative("Argument mismatch for method \"" + memberName + "\".");
         }
         return true;
+    }
+
+	CefRefPtr<CefV8Value> BindingHandler::ResolveCefObject(Object^ obj, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache)
+    {
+		IntPtr ptr;
+        if (cache != nullptr && cache->TryGetValue(obj, ptr))
+		{
+			return CefRefPtr<CefV8Value>((CefV8Value*)ptr.ToPointer());
+		}
+		
+		// wrap the managed object in an unmanaged wrapper
+        CefRefPtr<BindingData> bindingData = new BindingData(obj);
+        CefRefPtr<CefBase> userData = static_cast<CefRefPtr<CefBase>>(bindingData);
+
+        // create the javascript object and associate the wrapped object
+        CefRefPtr<CefV8Value> wrappedObject = window->CreateObject(NULL);
+        wrappedObject->SetUserData(userData);
+
+        // build a list of methods on the bound object
+        array<MethodInfo^>^ methods = obj->GetType()->GetMethods(BindingFlags::Instance | BindingFlags::Public);
+        IDictionary<String^, Object^>^ methodNames = gcnew Dictionary<String^, Object^>();
+        for each(MethodInfo^ method in methods) 
+        {
+            methodNames[method->Name] = nullptr;
+        }
+
+        // create a corresponding javascript method for each c# method
+        CefRefPtr<CefV8Handler> handler = static_cast<CefV8Handler*>(new BindingHandler(cache));
+        for each(String^ methodName in methodNames->Keys)
+        {
+            CefString nameStr = toNative(methodName);
+            wrappedObject->SetValue(nameStr, CefV8Value::CreateFunction(nameStr, handler), V8_PROPERTY_ATTRIBUTE_NONE);
+        }
+
+		return wrappedObject;
     }
 
     void BindingHandler::Bind(String^ name, Object^ obj, CefRefPtr<CefV8Value> window)
@@ -271,5 +337,10 @@ namespace CefSharp
         }
 
         window->SetValue(toNative(name), wrappedObject, V8_PROPERTY_ATTRIBUTE_NONE);
+    }
+
+	void BindingHandler::BindCached(String^ name, Object^ obj, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache)
+    {        
+        window->SetValue(toNative(name), ResolveCefObject(obj, window, cache), V8_PROPERTY_ATTRIBUTE_NONE);
     }
 }

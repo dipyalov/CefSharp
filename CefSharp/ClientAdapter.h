@@ -6,6 +6,7 @@
 namespace CefSharp
 {
     using namespace System;
+	using namespace System::Collections::Generic;
 
     interface class IWebBrowser;
 
@@ -25,10 +26,15 @@ namespace CefSharp
         CefRefPtr<CefBrowser> _cefBrowser;
 
         gcroot<String^> _tooltip;
+		gcroot<Dictionary<IntPtr, Dictionary<Object^, IntPtr>^>^> _contextBindings;		
 
     public:
         ~ClientAdapter() { _browserControl = nullptr; }
-        ClientAdapter(IWebBrowser^ browserControl) : _browserControl(browserControl) {}
+        ClientAdapter(IWebBrowser^ browserControl) : 
+			_browserControl(browserControl), 
+			_contextBindings(gcnew Dictionary<IntPtr, Dictionary<Object^, IntPtr>^>)
+		{
+		}
 
         HWND GetBrowserHwnd() { return _browserHwnd; }
         CefRefPtr<CefBrowser> GetCefBrowser() { return _cefBrowser; }
@@ -67,6 +73,7 @@ namespace CefSharp
 
         // CefV8ContextHandler
         virtual DECL void OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) OVERRIDE;
+		virtual DECL void OnContextReleased(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) OVERRIDE;
 
         // CefMenuHandler
         virtual DECL bool OnBeforeMenu(CefRefPtr<CefBrowser> browser, const CefMenuInfo& menuInfo) OVERRIDE;

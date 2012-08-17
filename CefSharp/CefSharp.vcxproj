@@ -119,6 +119,7 @@
     <ClCompile Include="RtzCountdownEvent.cpp" />
     <ClCompile Include="SchemeHandler.cpp" />
     <ClCompile Include="ScriptCore.cpp" />
+    <ClCompile Include="ScriptingObjectAttribute.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -152,6 +153,7 @@
     <ClInclude Include="SchemeHandler.h" />
     <ClInclude Include="ScriptCore.h" />
     <ClInclude Include="ScriptException.h" />
+    <ClInclude Include="ScriptingObjectAttribute.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="StreamAdapter.h" />
