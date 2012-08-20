@@ -55,59 +55,83 @@ namespace CefSharp
         }
         if (valueType == conversionType) return baseCost + 0;
 
-        if (valueType == Boolean::typeid)
-        {
-            // Boolean can be converted only to Boolean
-            if(conversionType == Boolean::typeid) return baseCost + 0;
-            return -1;
-        }
-        else if (valueType == Int32::typeid)
-        {
-            int int32Val = safe_cast<int>(value);
+		if (valueType->IsValueType )
+		{
+			if (valueType == Boolean::typeid)
+			{
+				// Boolean can be converted only to Boolean
+				if(conversionType == Boolean::typeid) return baseCost + 0;
+				return -1;
+			}
+			
+			if (valueType == Int32::typeid)
+			{
+				int int32Val = safe_cast<int>(value);
 
-            if (conversionType == Int32::typeid) return baseCost + 0;
-            else if (conversionType == UInt32::typeid && (int32Val >= 0)) return baseCost + 1;
-            else if (conversionType == Int16::typeid && (int32Val >= Int16::MinValue && int32Val <= Int16::MaxValue)) return baseCost + 2;
-            else if (conversionType == UInt16::typeid && (int32Val >= UInt16::MinValue && int32Val <= UInt16::MaxValue)) return baseCost + 3;
-            else if (conversionType == Char::typeid && (int32Val >= Char::MinValue && int32Val <= Char::MaxValue)) return baseCost + 4;
-            else if (conversionType == SByte::typeid && (int32Val >= SByte::MinValue && int32Val <= SByte::MaxValue)) return baseCost + 5;
-            else if (conversionType == Byte::typeid && (int32Val >= Byte::MinValue && int32Val <= Byte::MaxValue)) return baseCost + 6;
-            else if (conversionType == Double::typeid) return baseCost + 9;
-            else if (conversionType == Single::typeid) return baseCost + 10;
-            else if (conversionType == Decimal::typeid) return baseCost + 11;
-            else if (conversionType == Int64::typeid) return -1;
-            else if (conversionType == UInt64::typeid) return -1;
-            return -1;
-        }
-        else if(valueType == Double::typeid)
-        {
-            double doubleVal = safe_cast<double>(value);
+				if (conversionType == Int32::typeid) return baseCost + 0;
+				else if (conversionType == UInt32::typeid && (int32Val >= 0)) return baseCost + 1;
+				else if (conversionType == Int16::typeid && (int32Val >= Int16::MinValue && int32Val <= Int16::MaxValue)) return baseCost + 2;
+				else if (conversionType == UInt16::typeid && (int32Val >= UInt16::MinValue && int32Val <= UInt16::MaxValue)) return baseCost + 3;
+				else if (conversionType == Char::typeid && (int32Val >= Char::MinValue && int32Val <= Char::MaxValue)) return baseCost + 4;
+				else if (conversionType == SByte::typeid && (int32Val >= SByte::MinValue && int32Val <= SByte::MaxValue)) return baseCost + 5;
+				else if (conversionType == Byte::typeid && (int32Val >= Byte::MinValue && int32Val <= Byte::MaxValue)) return baseCost + 6;
+				else if (conversionType == Double::typeid) return baseCost + 9;
+				else if (conversionType == Single::typeid) return baseCost + 10;
+				else if (conversionType == Decimal::typeid) return baseCost + 11;
+				else if (conversionType == Int64::typeid) return -1;
+				else if (conversionType == UInt64::typeid) return -1;
+				return -1;
+			}
+			
+			if(valueType == Double::typeid)
+			{
+				double doubleVal = safe_cast<double>(value);
 
-            if (conversionType == Double::typeid) return baseCost + 0;
-            else if (conversionType == Single::typeid && (doubleVal >= Single::MinValue && doubleVal <= Single::MaxValue)) return baseCost + 1;
-            else if (conversionType == Decimal::typeid /* && (doubleVal >= Decimal::MinValue && doubleVal <= Decimal::MaxValue) */) return baseCost + 2;
-            else if (conversionType == Int32::typeid && (doubleVal >= Int32::MinValue && doubleVal <= Int32::MaxValue)) return baseCost + 3;
-            else if (conversionType == UInt32::typeid && (doubleVal >= UInt32::MinValue && doubleVal <= UInt32::MaxValue)) return baseCost + 4;
-            else if (conversionType == Int16::typeid && (doubleVal >= Int16::MinValue && doubleVal <= Int16::MaxValue)) return baseCost + 5;
-            else if (conversionType == UInt16::typeid && (doubleVal >= UInt16::MinValue && doubleVal <= UInt16::MaxValue)) return baseCost + 6;
-            else if (conversionType == Char::typeid && (doubleVal >= Char::MinValue && doubleVal <= Char::MaxValue)) return baseCost + 6;
-            else if (conversionType == SByte::typeid && (doubleVal >= SByte::MinValue && doubleVal <= SByte::MaxValue)) return baseCost + 8;
-            else if (conversionType == Byte::typeid && (doubleVal >= Byte::MinValue && doubleVal <= Byte::MaxValue)) return baseCost + 9;
-            else if (conversionType == Int64::typeid) return -1;
-            else if (conversionType == UInt64::typeid) return -1;
-            return -1;
-        }
-        else if(valueType == String::typeid)
+				if (conversionType == Double::typeid) return baseCost + 0;
+				else if (conversionType == Single::typeid && (doubleVal >= Single::MinValue && doubleVal <= Single::MaxValue)) return baseCost + 1;
+				else if (conversionType == Decimal::typeid /* && (doubleVal >= Decimal::MinValue && doubleVal <= Decimal::MaxValue) */) return baseCost + 2;
+				else if (conversionType == Int32::typeid && (doubleVal >= Int32::MinValue && doubleVal <= Int32::MaxValue)) return baseCost + 3;
+				else if (conversionType == UInt32::typeid && (doubleVal >= UInt32::MinValue && doubleVal <= UInt32::MaxValue)) return baseCost + 4;
+				else if (conversionType == Int16::typeid && (doubleVal >= Int16::MinValue && doubleVal <= Int16::MaxValue)) return baseCost + 5;
+				else if (conversionType == UInt16::typeid && (doubleVal >= UInt16::MinValue && doubleVal <= UInt16::MaxValue)) return baseCost + 6;
+				else if (conversionType == Char::typeid && (doubleVal >= Char::MinValue && doubleVal <= Char::MaxValue)) return baseCost + 6;
+				else if (conversionType == SByte::typeid && (doubleVal >= SByte::MinValue && doubleVal <= SByte::MaxValue)) return baseCost + 8;
+				else if (conversionType == Byte::typeid && (doubleVal >= Byte::MinValue && doubleVal <= Byte::MaxValue)) return baseCost + 9;
+				else if (conversionType == Int64::typeid) return -1;
+				else if (conversionType == UInt64::typeid) return -1;
+				return -1;
+			}
+
+			if (conversionType == Object::typeid)
+			{
+				return baseCost + 1;
+			}
+		}
+		else
         {
-            // String can be converted only to String
-            if(conversionType == String::typeid) return baseCost + 0;
-            return -1;
-        }
-        else
-        {
-            // No conversion available
-            return -1;
-        }
+			if(valueType == String::typeid)
+			{
+				// String can be converted only to String
+				if(conversionType == String::typeid) return baseCost + 0;
+				return -1;
+			}
+
+			if (conversionType->IsAssignableFrom(valueType))
+			{
+				int relCost = 0;
+				for (Type^ t = valueType->BaseType; t != nullptr; t = t->BaseType)
+				{
+					relCost++;
+					if (t == conversionType)
+					{
+						return baseCost + relCost;
+					}
+				}
+			}
+		}
+        
+        // No conversion available
+        return -1;        
     }
 
     Object^ BindingHandler::ChangeType(Object^ value, Type^ conversionType)
@@ -118,6 +142,11 @@ namespace CefSharp
         }
 
         if (value == nullptr) return nullptr;
+
+		if (conversionType->IsAssignableFrom(value->GetType()))
+		{
+			return value;
+		}
 
         Type^ targetType = Nullable::GetUnderlyingType(conversionType);
         if (targetType != nullptr) conversionType = targetType;
@@ -142,7 +171,7 @@ namespace CefSharp
 				return CefRefPtr<CefV8Value>((CefV8Value*)ptr.ToPointer());
 			}
 
-			if (obj->GetType()->GetCustomAttributes(ScriptingObjectAttribute::typeid, true).Length > 0)
+			if (obj->GetType()->GetCustomAttributes(ScriptingObjectAttribute::typeid, true)->Length > 0)
 			{
 				CefRefPtr<CefV8Value> value = ResolveCefObject(obj, window, cache);
 				CefV8Value *valuePtr = value.get();
@@ -196,26 +225,58 @@ namespace CefSharp
         MethodInfo^ bestMethod;
         array<Object^>^ bestMethodArguments;
         int bestMethodCost = -1;
+		bool bestMethodParamsMode = false;
 
         for (int i = 0; i < members->Length; i++)
         {
             MethodInfo^ method = (MethodInfo^) members[i];
             array<ParameterInfo^>^ parametersInfo = method->GetParameters();
-            array<Object^>^ arguments;
+			Type^ paramsType = nullptr;
+            if (parametersInfo->Length > 0)
+			{
+				ParameterInfo^ param = parametersInfo[parametersInfo->Length - 1];
+				if (param->GetCustomAttributes(ParamArrayAttribute::typeid, true)->Length > 0)
+				{
+					if (param->ParameterType->IsArray && param->ParameterType->GetArrayRank() == 1)
+					{
+						paramsType = param->ParameterType->GetElementType();
+					}
+				}
+			}	
 
-            if (suppliedArguments->Length == parametersInfo->Length)
+            if (suppliedArguments->Length == parametersInfo->Length || paramsType != nullptr && suppliedArguments->Length >= parametersInfo->Length - 1)
             {
                 int failed = 0;
                 int cost = 0;
-                arguments = gcnew array<Object^>(suppliedArguments->Length);
+                array<Object^>^ arguments = gcnew array<Object^>(parametersInfo->Length);
+				bool paramsMode = suppliedArguments->Length < parametersInfo->Length;
+				array<Object^>^ paramsArguments = nullptr;
 
                 try
                 {
                     for (int p = 0; p < suppliedArguments->Length; p++)
                     {
-                        System::Type^ paramType = parametersInfo[p]->ParameterType;
+                        System::Type^ paramType = p < parametersInfo->Length ? parametersInfo[p]->ParameterType : paramsType;
+						int paramCost = -1;
 
-                        int paramCost = GetChangeTypeCost(suppliedArguments[p], paramType);
+						// check for "params" type
+						if (paramsType != nullptr && p == parametersInfo->Length - 1)
+						{
+							paramCost = GetChangeTypeCost(suppliedArguments[p], paramType);
+							if (paramCost < 0)
+							{
+								paramType = paramsType;								
+								paramsMode = true;
+								paramsArguments = gcnew array<Object^>(suppliedArguments->Length - parametersInfo->Length + 1);
+								arguments[p] = paramsArguments;
+								paramCost = GetChangeTypeCost(suppliedArguments[p], paramType);
+							}
+						}
+						else
+						{
+							paramCost = GetChangeTypeCost(suppliedArguments[p], paramType);
+						}
+												
                         if (paramCost < 0 )
                         {
                             failed++;
@@ -223,7 +284,14 @@ namespace CefSharp
                         }
                         else
                         {
-                            arguments[p] = ChangeType(suppliedArguments[p], paramType);
+                            if (paramsMode)
+							{
+								paramsArguments[p - parametersInfo->Length + 1] = ChangeType(suppliedArguments[p], paramType);
+							}
+							else
+							{
+								arguments[p] = ChangeType(suppliedArguments[p], paramType);
+							}
                             cost += paramCost;
                         }
                     }
@@ -236,13 +304,14 @@ namespace CefSharp
                 if (failed > 0)
                 {
                     continue;
-                }
+                }				
 
-                if (cost < bestMethodCost || bestMethodCost < 0)
+                if ((paramsMode <= bestMethodParamsMode && cost < bestMethodCost) || bestMethodCost < 0)
                 {
                     bestMethod = method;
                     bestMethodArguments = arguments;
                     bestMethodCost = cost;
+					bestMethodParamsMode = paramsMode;
                 }
 
                 // this is best as possible cost

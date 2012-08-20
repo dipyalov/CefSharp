@@ -222,15 +222,24 @@ namespace CefSharp
     void ClientAdapter::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context)
     {
 		CefV8Context* contextPtr = context.get();
-		contextPtr->AddRef();
-		IntPtr ptr(contextPtr);
+		contextPtr->AddRef();		
 
-		Dictionary<Object^, IntPtr>^ bindings;
-		if (!_contextBindings->TryGetValue(ptr, bindings))
-		{		
-			_contextBindings->default[ptr] = bindings = gcnew Dictionary<Object^, IntPtr>();
+		Dictionary<Object^, IntPtr>^ bindings = nullptr;
+		for (int i = _contextBindings->Count - 1; i >= 0; i--)
+		{
+			KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^> p = _contextBindings->default[i];
+			if (((CefV8Context*)p.Key.ToPointer())->IsSame(contextPtr))
+			{
+				bindings = p.Value;
+				break;
+			}
+		}
+		if (bindings == nullptr)
+		{
+			_contextBindings->Add(KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>(IntPtr(contextPtr), bindings = gcnew Dictionary<Object^, IntPtr>()));
 		}
 
+		
         for each(KeyValuePair<String^, Object^>^ kvp in CEF::GetBoundObjects())
         {
             BindingHandler::BindCached(kvp->Key, kvp->Value, context->GetGlobal(), bindings);
@@ -245,17 +254,22 @@ namespace CefSharp
 	void ClientAdapter::OnContextReleased(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context)
     {
 		CefV8Context *contextPtr = context.get();
-		IntPtr ptr(contextPtr);
-
-		Dictionary<Object^, IntPtr>^ bindings;
-		if (_contextBindings->TryGetValue(ptr, bindings))
+		
+		for (int i = _contextBindings->Count - 1; i >= 0; i--)
 		{
-			_contextBindings->Remove(ptr);
-			contextPtr->Release();
-
-			for each (KeyValuePair<Object^, IntPtr> p in bindings)
+			KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^> p = _contextBindings->default[i];
+			if (!((CefV8Context*)p.Key.ToPointer())->IsSame(contextPtr))
 			{
-				((CefV8Value*)p.Value.ToPointer())->Release();
+				continue;
+			}
+			
+			((CefV8Context*)p.Key.ToPointer())->Release();
+			_contextBindings->RemoveAt(i);
+
+			Dictionary<Object^, IntPtr>^ bindings = p.Value;
+			for each (KeyValuePair<Object^, IntPtr> b in bindings)
+			{
+				((CefV8Value*)b.Value.ToPointer())->Release();
 			}
 			bindings->Clear();
 		}

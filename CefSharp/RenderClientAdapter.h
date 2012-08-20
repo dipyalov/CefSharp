@@ -16,7 +16,7 @@ namespace CefSharp
         gcroot<IRenderWebBrowser^> _renderBrowserControl;
 
     public:
-        ~RenderClientAdapter() { _renderBrowserControl = nullptr; }
+        virtual ~RenderClientAdapter() { _renderBrowserControl = nullptr; }
         RenderClientAdapter(IRenderWebBrowser^ offscreenBrowserControl) : ClientAdapter((IWebBrowser^)offscreenBrowserControl)
         {
             _renderBrowserControl = offscreenBrowserControl;

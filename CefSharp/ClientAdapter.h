@@ -26,13 +26,28 @@ namespace CefSharp
         CefRefPtr<CefBrowser> _cefBrowser;
 
         gcroot<String^> _tooltip;
-		gcroot<Dictionary<IntPtr, Dictionary<Object^, IntPtr>^>^> _contextBindings;		
+		gcroot<List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>^> _contextBindings;		
 
     public:
-        ~ClientAdapter() { _browserControl = nullptr; }
+        virtual ~ClientAdapter()
+		{
+			_browserControl = nullptr;
+			List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>^ list = static_cast<List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>^>(_contextBindings);
+			for each (KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^> p in list)
+			{			
+				((CefV8Context*)p.Key.ToPointer())->Release();			
+
+				for each (KeyValuePair<Object^, IntPtr> b in p.Value)
+				{
+					((CefV8Value*)b.Value.ToPointer())->Release();
+				}
+				p.Value->Clear();
+			}
+			_contextBindings->Clear();
+		}
         ClientAdapter(IWebBrowser^ browserControl) : 
 			_browserControl(browserControl), 
-			_contextBindings(gcnew Dictionary<IntPtr, Dictionary<Object^, IntPtr>^>)
+			_contextBindings(gcnew List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>)
 		{
 		}
 
