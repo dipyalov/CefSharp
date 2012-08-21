@@ -185,7 +185,15 @@ namespace CefSharp
 		if (obj->IsArray())
 		{
 			int arrLength = obj->GetArrayLength();
+			List<Object^>^ result = gcnew List<Object^>(arrLength);
 
+			for (int i = 0; i < arrLength; i++)
+			{
+				result->Add(convertFromCef(obj->GetValue(i)));
+			}
+
+			return result;
+			/*
 			if (arrLength > 0)
 			{
 				std::vector<CefString> keys;
@@ -217,6 +225,7 @@ namespace CefSharp
 			}
 
 			return nullptr;
+			*/
 		}
 
 		if (obj->IsObject())
