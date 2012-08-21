@@ -283,7 +283,15 @@ namespace CefSharp
             return false;
         }
 
-        return handler->OnBeforeMenu(_browserControl);
+		MenuInfo^ mi = gcnew MenuInfo(menuInfo);
+		try
+		{
+			return handler->OnBeforeMenu(_browserControl, mi);
+		}
+		finally
+		{
+			delete mi;
+		}       
     }
 
     void ClientAdapter::OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next)
