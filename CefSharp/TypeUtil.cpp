@@ -28,6 +28,7 @@ namespace CefSharp
 			return true;
         }
 
+		type = obj->GetType();
         Type^ underlyingType = Nullable::GetUnderlyingType(type);
         if(underlyingType!=nullptr)type = underlyingType;
 

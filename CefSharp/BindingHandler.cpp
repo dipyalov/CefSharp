@@ -57,6 +57,11 @@ namespace CefSharp
 
 		if (valueType->IsValueType )
 		{
+			if (conversionType == Object::typeid)
+			{
+				return baseCost + 1;
+			}
+			
 			if (valueType == Boolean::typeid)
 			{
 				// Boolean can be converted only to Boolean
@@ -112,7 +117,14 @@ namespace CefSharp
 			if(valueType == String::typeid)
 			{
 				// String can be converted only to String
-				if(conversionType == String::typeid) return baseCost + 0;
+				if(conversionType == String::typeid) 
+				{
+					return baseCost + 0;
+				}
+				if (conversionType == Object::typeid)
+				{
+					return baseCost + 1;
+				}
 				return -1;
 			}
 
@@ -284,7 +296,7 @@ namespace CefSharp
                         }
                         else
                         {
-                            if (paramsMode)
+                            if (paramsMode && p >= parametersInfo->Length - 1 )
 							{
 								paramsArguments[p - parametersInfo->Length + 1] = ChangeType(suppliedArguments[p], paramType);
 							}
@@ -324,17 +336,21 @@ namespace CefSharp
         {
             try
             {
-                Object^ result = bestMethod->Invoke(self, bestMethodArguments);
+                Object^ result = bestMethod->Invoke(self, bestMethodArguments);				
                 retval = ConvertToCefWithScripting(result, bestMethod->ReturnType, object,  _objectCache);
                 return true;
-            }
-            catch(System::Reflection::TargetInvocationException^ err)
-            {
-                exception = toNative(err->InnerException->Message);
-            }
+            }            
             catch(System::Exception^ err)
             {
-                exception = toNative(err->Message);
+                while (System::Reflection::TargetInvocationException::typeid->IsAssignableFrom(err->GetType()))
+				{
+					if (err->InnerException == nullptr)
+					{
+						break;
+					}
+					err = err->InnerException;
+				}
+				exception = toNative(err->Message);
             }
         }
         else

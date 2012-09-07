@@ -64,7 +64,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -113,6 +113,7 @@
     <ClCompile Include="BrowserCore.cpp" />
     <ClCompile Include="ClientAdapter.cpp" />
     <ClCompile Include="CookieVisitor.cpp" />
+    <ClCompile Include="IScriptingObject.cpp" />
     <ClCompile Include="RenderClientAdapter.cpp" />
     <ClCompile Include="Request.cpp" />
     <ClCompile Include="RequestResponse.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="ClientAdapter.h" />
     <ClInclude Include="ConsoleMessageEventArgs.h" />
     <ClInclude Include="CookieVisitor.h" />
+    <ClInclude Include="HandlerErrorCode.h" />
     <ClInclude Include="ICookieVisitor.h" />
     <ClInclude Include="IKeyboardHandler.h" />
     <ClInclude Include="ILifeSpanHandler.h" />
@@ -143,6 +145,7 @@
     <ClInclude Include="IMenuHandler.h" />
     <ClInclude Include="IRenderWebBrowser.h" />
     <ClInclude Include="IRequestHandler.h" />
+    <ClInclude Include="IScriptingObject.h" />
     <ClInclude Include="IWebBrowser.h" />
     <ClInclude Include="LoadCompletedEventArgs.h" />
     <ClInclude Include="MCefRefPtr.h" />

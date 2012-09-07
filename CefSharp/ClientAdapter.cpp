@@ -10,6 +10,7 @@
 #include "IRequestHandler.h"
 #include "IMenuHandler.h"
 #include "IKeyboardHandler.h"
+#include "HandlerErrorCode.h"
 
 namespace CefSharp
 {
@@ -231,6 +232,7 @@ namespace CefSharp
 			if (((CefV8Context*)p.Key.ToPointer())->IsSame(contextPtr))
 			{
 				bindings = p.Value;
+				contextPtr->Release();
 				break;
 			}
 		}
