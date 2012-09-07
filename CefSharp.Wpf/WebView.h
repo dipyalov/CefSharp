@@ -34,6 +34,7 @@ namespace Wpf
         BrowserCore^ _browserCore;
         MCefRefPtr<ScriptCore> _scriptCore;
 		
+        Object^ _sync;
         HwndSource^ _source;
         Matrix^ _matrix;
         HwndSourceHook^ _hook;
@@ -216,11 +217,6 @@ namespace Wpf
         {
             IKeyboardHandler^ get() { return _browserCore->KeyboardHandler; }
             void set(IKeyboardHandler^ handler) { _browserCore->KeyboardHandler = handler; }
-        }
-
-        virtual property BrowserCore^ Core
-        {
-            BrowserCore^ get() { return _browserCore; }
         }
 
         virtual void OnInitialized();
