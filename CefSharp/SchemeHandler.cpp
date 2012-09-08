@@ -19,16 +19,23 @@ namespace CefSharp
 
         AutoLock lock_scope(this);
 
-        IRequest^ requestWrapper = gcnew CefRequestWrapper(request);
-        if (_handler->ProcessRequest(requestWrapper, mimeType, stream))
-        {
-            _mime_type = toNative(mimeType);
-            _stream = stream;
-            callback->HeadersAvailable();
+        CefRequestWrapper^ requestWrapper = gcnew CefRequestWrapper(request);
+		try
+		{
+			if (_handler->ProcessRequest(requestWrapper, mimeType, stream))
+			{
+				_mime_type = toNative(mimeType);
+				_stream = stream;
+				callback->HeadersAvailable();
 
-            handled = true;
-        }
-
+				handled = true;
+			}
+		}
+		finally
+		{
+			// release unmanaged resources
+			requestWrapper->~CefRequestWrapper();
+		}
         return handled;
     }
 

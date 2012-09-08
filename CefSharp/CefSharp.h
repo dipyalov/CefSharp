@@ -127,7 +127,7 @@ namespace CefSharp
 
             if (manager != nullptr)
             {
-                manager->VisitAllCookies(static_cast<CefRefPtr<CefCookieVisitor>>(cookieVisitor));
+                return manager->VisitAllCookies(static_cast<CefRefPtr<CefCookieVisitor>>(cookieVisitor));
             }
             else
             {
@@ -222,7 +222,14 @@ namespace CefSharp
 
         static void Shutdown()
         {
-            if (IsInitialized)
+			// some unmanaged resources are still grabbed by managed wrappers
+			// they are released after all but to prevent debugging asserts
+			// we force their release manually
+#if !DEBUG
+			GC::Collect();
+			GC::WaitForPendingFinalizers();
+#endif
+			if (IsInitialized)
             {
                 CefShutdown();
             }

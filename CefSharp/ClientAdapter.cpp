@@ -38,7 +38,7 @@ namespace CefSharp
     }
 
     void ClientAdapter::OnBeforeClose(CefRefPtr<CefBrowser> browser)
-    {
+    {	
         if (_browserHwnd == browser->GetWindowHandle())
         {
             _cefBrowser = nullptr;
@@ -163,9 +163,17 @@ namespace CefSharp
         }
 
         CefRequestWrapper^ wrapper = gcnew CefRequestWrapper(request);
-        NavigationType navigationType = (NavigationType)navType;
+		try
+		{
+			NavigationType navigationType = (NavigationType)navType;
 
-        return handler->OnBeforeBrowse(_browserControl, wrapper, navigationType, isRedirect);
+			return handler->OnBeforeBrowse(_browserControl, wrapper, navigationType, isRedirect);
+		}
+		finally
+		{
+			// release unmanaged resources
+			wrapper->~CefRequestWrapper();
+		}
     }
 
     bool ClientAdapter::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefRequest> request, CefString& redirectUrl, CefRefPtr<CefStreamReader>& resourceStream, CefRefPtr<CefResponse> response, int loadFlags)
@@ -178,21 +186,30 @@ namespace CefSharp
 
         CefRequestWrapper^ wrapper = gcnew CefRequestWrapper(request);
         RequestResponse^ requestResponse = gcnew RequestResponse(wrapper);
+		bool ret;
+		try
+		{
+			bool ret = handler->OnBeforeResourceLoad(_browserControl, requestResponse);
 
-        bool ret = handler->OnBeforeResourceLoad(_browserControl, requestResponse);
+			if (requestResponse->Action == ResponseAction::Redirect)
+			{
+				redirectUrl = toNative(requestResponse->RedirectUrl);
+			}
+			else if (requestResponse->Action == ResponseAction::Respond)
+			{
+				CefRefPtr<StreamAdapter> adapter = new StreamAdapter(requestResponse->ResponseStream);
+				resourceStream = CefStreamReader::CreateForHandler(static_cast<CefRefPtr<CefReadHandler>>(adapter));
+				response->SetMimeType(toNative(requestResponse->MimeType));
+			}
 
-        if (requestResponse->Action == ResponseAction::Redirect)
-        {
-            redirectUrl = toNative(requestResponse->RedirectUrl);
-        }
-        else if (requestResponse->Action == ResponseAction::Respond)
-        {
-            CefRefPtr<StreamAdapter> adapter = new StreamAdapter(requestResponse->ResponseStream);
-            resourceStream = CefStreamReader::CreateForHandler(static_cast<CefRefPtr<CefReadHandler>>(adapter));
-            response->SetMimeType(toNative(requestResponse->MimeType));
-        }
-
-        return ret;
+			return ret;
+		}
+		finally
+		{
+			// release unmanaged resources
+			requestResponse->~RequestResponse();
+			wrapper->~CefRequestWrapper();
+		}        
     }
 
     void ClientAdapter::OnResourceResponse(CefRefPtr<CefBrowser> browser, const CefString& url, CefRefPtr<CefResponse> response, CefRefPtr<CefContentFilter>& filter)

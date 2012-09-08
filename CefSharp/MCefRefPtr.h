@@ -2,17 +2,17 @@
 
 namespace CefSharp
 {
-    template <typename T>
+	template <typename T>
     ref class MCefRefPtr sealed
     {
     private:
         T* _ptr;
 
     public:
-        MCefRefPtr() : _ptr(NULL) {}
+	    MCefRefPtr() : _ptr(NULL) {}
 
         MCefRefPtr(T* p) : _ptr(p)
-        {
+        {			
             if (_ptr)
             {
                 _ptr->AddRef();
@@ -20,7 +20,7 @@ namespace CefSharp
         }
 
         MCefRefPtr(const MCefRefPtr<T>% r) : _ptr(r._ptr)
-        {
+        {			
             if (_ptr)
             {
                 _ptr->AddRef();
@@ -28,8 +28,8 @@ namespace CefSharp
         }
 
         MCefRefPtr(const CefRefPtr<T>& r) : _ptr(r.get())
-        {
-            if (_ptr)
+        {            
+			if (_ptr)
             {
                 _ptr->AddRef();
             }
@@ -39,7 +39,8 @@ namespace CefSharp
         {
             if (_ptr)
             {
-                _ptr->Release();
+               	_ptr->Release();				
+				_ptr = NULL;
             }
         }
 
@@ -47,7 +48,8 @@ namespace CefSharp
         {
             if (_ptr)
             {
-                _ptr->Release();
+                _ptr->Release();				
+				_ptr = NULL;
             }
         }
 
@@ -74,7 +76,7 @@ namespace CefSharp
         {
             // AddRef first so that self assignment should work
             if (p)
-            {
+            {				
                 p->AddRef();
             }
             if (_ptr )
