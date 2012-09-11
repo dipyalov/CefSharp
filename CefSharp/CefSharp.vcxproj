@@ -128,6 +128,7 @@
     <ClCompile Include="StreamAdapter.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="TypeUtil.cpp" />
+    <ClCompile Include="ScriptCustomEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BindingHandler.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="StreamAdapter.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="TypeUtil.h" />
+    <ClInclude Include="ScriptCustomEvent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

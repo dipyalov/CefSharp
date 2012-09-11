@@ -112,9 +112,13 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="..\CefSharp\StringUtil.cpp" />
     <ClCompile Include="WebView.cpp" />
+    <ClCompile Include="WebViewCustomEvent.cpp" />
+    <ClCompile Include="WebViewScriptCustomEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebView.h" />
+    <ClInclude Include="WebViewCustomEvent.h" />
+    <ClInclude Include="WebViewScriptCustomEvent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

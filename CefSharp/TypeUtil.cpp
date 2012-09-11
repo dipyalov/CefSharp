@@ -4,6 +4,11 @@ using namespace System::Collections::Generic;
 
 namespace CefSharp
 {
+	CefRefPtr<CefV8Value> convertToCef(Object^ obj)
+    {        
+		return convertToCef(obj, obj == nullptr ? Object::typeid : obj->GetType());	
+    }	
+
     CefRefPtr<CefV8Value> convertToCef(Object^ obj, Type^ type)
     {
         CefRefPtr<CefV8Value> result;

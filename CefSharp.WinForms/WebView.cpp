@@ -1,4 +1,5 @@
 #include "WebView.h"
+#include "WebViewCustomEvent.h"
 
 using namespace System::Drawing;
 
@@ -14,8 +15,7 @@ namespace WinForms
             throw gcnew InvalidOperationException("CEF::Initialize() failed");
         }
 
-        TabStop = true;
-
+        TabStop = true;		
         _settings = settings;
         _browserCore = gcnew BrowserCore(address);
         _scriptCore = new ScriptCore();
@@ -316,6 +316,22 @@ namespace WinForms
             return nullptr;
         }
     }
+
+	void WebView::DispatchCustomEvent(WebViewCustomEvent^ customEvent)
+	{
+		if (!customEvent)
+		{
+			return;
+		}
+
+		_browserCore->CheckBrowserInitialization();
+
+        CefRefPtr<CefBrowser> browser;
+        if (TryGetCefBrowser(browser))
+        {
+            _scriptCore->DispatchCustomEvent(browser, customEvent->MakeScriptEvent(this));
+        }      
+	}
 
     void WebView::SetNavState(bool isLoading, bool canGoBack, bool canGoForward)
     {

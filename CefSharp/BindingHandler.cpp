@@ -133,12 +133,17 @@ namespace CefSharp
 				int relCost = 0;
 				for (Type^ t = valueType->BaseType; t != nullptr; t = t->BaseType)
 				{
-					relCost++;
+					relCost++;				
 					if (t == conversionType)
 					{
-						return baseCost + relCost;
+						break;
 					}
-				}
+					if (!conversionType->IsAssignableFrom(t))
+					{
+						break;
+					}
+				}				
+				return baseCost + relCost;
 			}
 		}
         

@@ -26,8 +26,7 @@ namespace CefSharp
         CefRefPtr<CefBrowser> _cefBrowser;
 
         gcroot<String^> _tooltip;
-		gcroot<List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>^> _contextBindings;		
-
+		gcroot<List<KeyValuePair<IntPtr, Dictionary<Object^, IntPtr>^>>^> _contextBindings;
     public:
         virtual ~ClientAdapter()
 		{
