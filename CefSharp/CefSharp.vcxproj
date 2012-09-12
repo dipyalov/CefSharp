@@ -111,6 +111,7 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="BindingHandler.cpp" />
     <ClCompile Include="BrowserCore.cpp" />
+    <ClCompile Include="CefCallbackWrapper.cpp" />
     <ClCompile Include="ClientAdapter.cpp" />
     <ClCompile Include="CookieVisitor.cpp" />
     <ClCompile Include="IScriptingObject.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="BindingHandler.h" />
     <ClInclude Include="BrowserCore.h" />
     <ClInclude Include="BrowserSettings.h" />
+    <ClInclude Include="CefCallbackWrapper.h" />
     <ClInclude Include="CefSharp.h" />
     <ClInclude Include="ClientAdapter.h" />
     <ClInclude Include="ConsoleMessageEventArgs.h" />
