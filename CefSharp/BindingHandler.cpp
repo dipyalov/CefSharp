@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "BindingHandler.h"
 #include "ScriptingObjectAttribute.h"
+#include "CefCallbackWrapper.h"
+
+using namespace System::Threading;
 
 namespace CefSharp
 {
@@ -172,7 +175,7 @@ namespace CefSharp
     }
 
 
-	CefRefPtr<CefV8Value> BindingHandler::ConvertToCefWithScripting(Object^ obj, Type^ type, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache)
+    CefRefPtr<CefV8Value> BindingHandler::ConvertToCefWithScripting(Object^ obj, Type^ type, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache)
     {
         CefRefPtr<CefV8Value> result;
 		if (tryConvertToCef(obj, type, result))
@@ -200,11 +203,39 @@ namespace CefSharp
 
         throw gcnew Exception("Cannot convert object from CLR to Cef " + type->ToString() + ".");
     }
+    
+    // stateObj is an array<Object^>
+    // [0] : method (MethodInfo^)
+    // [1] : 'this' (Object^)
+    // [2] : arguments (array<Object^>^)
+    void MethodRunner(Object^ stateObj)
+    {
+        MethodInfo^ method;
+        Object^ self;
+        array<Object^>^ args;
+        try{
+            array<Object^>^ stateArgs = static_cast<array<Object^>^>(stateObj);
+            method = static_cast<MethodInfo^>(stateArgs[0]);
+            self = stateArgs[1];
+            args = static_cast<array<Object^>^>(stateArgs[2]);
+            method->Invoke(self, args);
+        }
+        finally{
+            for(int i=0; i<args->Length; i++){
+                if(args[i]->GetType() == CefCallbackWrapper::typeid){
+                    (static_cast<CefCallbackWrapper^>(args[i]))->CefCallbackWrapper::~CefCallbackWrapper();
+                }
+            }
+        }
+    }
+
+
 
     bool BindingHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception)
     {
         CefRefPtr<BindingData> bindingData = static_cast<BindingData*>(object->GetUserData().get());
         Object^ self = bindingData->Get();
+
         if(self == nullptr) 
         {
             exception = "Binding's CLR object is null.";
@@ -341,8 +372,25 @@ namespace CefSharp
         {
             try
             {
+                if(bestMethod->ReturnType == System::Void::typeid)
+                {
+                    array<Object^>^ state = {bestMethod, self, bestMethodArguments};
+                    ThreadPool::QueueUserWorkItem(gcnew WaitCallback(MethodRunner), state);
+                } 
+                else
+                {
+                    try{
                 Object^ result = bestMethod->Invoke(self, bestMethodArguments);				
                 retval = ConvertToCefWithScripting(result, bestMethod->ReturnType, object,  _objectCache);
+                    }
+                    finally{
+                        for(int i=0; i<bestMethodArguments->Length; i++){
+                            if(bestMethodArguments[i]->GetType() == CefCallbackWrapper::typeid){
+                                (static_cast<CefCallbackWrapper^>(bestMethodArguments[i]))->CefCallbackWrapper::~CefCallbackWrapper();
+                            }
+                        }
+                    }
+                }
                 return true;
             }            
             catch(System::Exception^ err)
