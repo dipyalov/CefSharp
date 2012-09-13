@@ -134,6 +134,17 @@ namespace CefSharp
 			result = cefArray;
             return true;
         }
+		IDictionary<String^, Object^>^ dic = dynamic_cast<IDictionary<String^, Object^>^>(obj);
+		if (dic != nullptr)
+		{			
+			CefRefPtr<CefV8Value> cefArray = CefV8Value::CreateArray(dic->Count);
+			for each(KeyValuePair<String^, Object^> p in dic)
+			{				
+				cefArray->SetValue(toNative(p.Key), convertToCef(p.Value), V8_PROPERTY_ATTRIBUTE_NONE);
+			}
+			result = cefArray;
+            return true;
+		}
         if (type->IsValueType && !type->IsPrimitive && !type->IsEnum)
         {
             cli::array<System::Reflection::FieldInfo^>^ fields = type->GetFields();
@@ -234,10 +245,10 @@ namespace CefSharp
 			*/
 		}
     
-    if (obj->IsFunction())
-    {
-      return gcnew CefCallbackWrapper(obj);
-    }
+		if (obj->IsFunction())
+		{
+			return gcnew CefCallbackWrapper(obj);
+		}
 
 		if (obj->IsObject())
 		{

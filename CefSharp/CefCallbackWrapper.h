@@ -14,21 +14,13 @@ namespace CefSharp
 	{
 	public:
 		CefCallbackWrapper(CefRefPtr<CefV8Value> callback);
-		~CefCallbackWrapper(){
-			if(cbInfo)
-			{
-				while(cbInfo->callCount)
-				{
-					Thread::Sleep(0);
-				}
-				cbInfo->callback->Release();
-				cbInfo->context->Release();
-				delete cbInfo;
-				cbInfo = 0;
-			}
-		}
+		~CefCallbackWrapper();
+		
 		void Call(...array<Object^> ^args);
-	private:
+	internal:
 		CEF_CALLBACK_INFO *cbInfo;
+		void Cleanup();	
+	private:
+		bool disposed;
 	};
 }
