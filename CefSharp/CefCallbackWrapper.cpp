@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "BindingHandler.h"
 #include "CefCallbackWrapper.h"
 #include "include/cef_runnable.h"
 
@@ -12,10 +13,11 @@ namespace CefSharp
 		{
 			wrapper->cbInfo->context->Enter();
 
-			CefV8ValueList arguments = CefV8ValueList(args->Length);
+			CefV8ValueList arguments = CefV8ValueList(args->Length);		
+			CefRefPtr<CefV8Value> window = wrapper->cbInfo->context->GetCurrentContext()->GetGlobal();
 			for(int i = 0; i < args->Length; i++)
 			{
-				arguments[i] = convertToCef(args[i], args[i]->GetType());
+				arguments[i] = BindingHandler::ConvertToCefWithScripting(args[i], args[i]->GetType(), window, nullptr); //  convertToCef(args[i], args[i]->GetType());
 			}
 
 			wrapper->cbInfo->callback->ExecuteFunction(CefV8Value::CreateUndefined() , arguments);

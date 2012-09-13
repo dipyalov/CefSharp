@@ -183,6 +183,7 @@ namespace CefSharp
 			return result;
 		}       
 
+		
 		if (cache != nullptr)
 		{
 			IntPtr ptr;
@@ -190,16 +191,19 @@ namespace CefSharp
 			{
 				return CefRefPtr<CefV8Value>((CefV8Value*)ptr.ToPointer());
 			}
+		}
 
-			if (obj->GetType()->GetCustomAttributes(ScriptingObjectAttribute::typeid, true)->Length > 0)
+		if (obj->GetType()->GetCustomAttributes(ScriptingObjectAttribute::typeid, true)->Length > 0)
+		{
+			CefRefPtr<CefV8Value> value = ResolveCefObject(obj, window, cache);
+			if (cache != nullptr)
 			{
-				CefRefPtr<CefV8Value> value = ResolveCefObject(obj, window, cache);
 				CefV8Value *valuePtr = value.get();
 				valuePtr->AddRef();
 				cache[obj] = IntPtr(valuePtr);
-				return value;
 			}
-		}
+			return value;
+		}		
 
 		throw gcnew Exception("Cannot convert object from CLR to Cef " + type->ToString() + ".");
 	}
@@ -232,8 +236,6 @@ namespace CefSharp
 			}
 		}
 	}
-
-
 
 	bool BindingHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception)
 	{

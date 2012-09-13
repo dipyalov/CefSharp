@@ -32,8 +32,7 @@ namespace CefSharp
 		// Type Converter
         static bool IsNullableType(Type^ type);
         static int GetChangeTypeCost(Object^ value, Type^ conversionType);
-        static Object^ ChangeType(Object^ value, Type^ conversionType);
-		static CefRefPtr<CefV8Value> ConvertToCefWithScripting(Object^ obj, Type^ type, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache);
+        static Object^ ChangeType(Object^ value, Type^ conversionType);		
 		static CefRefPtr<CefV8Value> ResolveCefObject(Object^ obj, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache);
 
         CefRefPtr<CefV8Value> ConvertToCef(Object^ obj, Type^ type);
@@ -43,6 +42,7 @@ namespace CefSharp
 		BindingHandler() {}
 		BindingHandler(Dictionary<Object^, IntPtr>^ objectCache) : _objectCache(objectCache) {}
 
+		static CefRefPtr<CefV8Value> ConvertToCefWithScripting(Object^ obj, Type^ type, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache);
         static void Bind(String^ name, Object^ obj, CefRefPtr<CefV8Value> window);
 		static void BindCached(String^ name, Object^ obj, CefRefPtr<CefV8Value> window, Dictionary<Object^, IntPtr>^ cache);
 
