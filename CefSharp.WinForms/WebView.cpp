@@ -100,9 +100,18 @@ namespace WinForms
 
     void WebView::LoadHtml(String^ html)
     {
+        this->LoadHtml(html, nullptr);		
+    }
+
+	void WebView::LoadHtml(String^ html, String^ url)
+    {
+		if (url == nullptr)
+		{
+			 url = "about:blank";
+		}
         _browserCore->CheckBrowserInitialization();
         _browserCore->OnLoad();
-        _clientAdapter->GetCefBrowser()->GetMainFrame()->LoadString(toNative(html), toNative("about:blank"));
+        _clientAdapter->GetCefBrowser()->GetMainFrame()->LoadString(toNative(html), toNative(url));
     }
 
     void WebView::Stop()

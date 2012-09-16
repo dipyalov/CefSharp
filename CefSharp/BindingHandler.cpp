@@ -378,12 +378,12 @@ namespace CefSharp
 		{
 			try
 			{
-				if(bestMethod->ReturnType == System::Void::typeid)
+				/*if(bestMethod->ReturnType == System::Void::typeid)
 				{
 					array<Object^>^ state = {bestMethod, self, bestMethodArguments};
 					ThreadPool::QueueUserWorkItem(gcnew WaitCallback(MethodRunner), state);
 				} 
-				else
+				else*/
 				{
 					try
 					{
