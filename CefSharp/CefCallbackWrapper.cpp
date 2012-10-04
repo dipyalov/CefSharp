@@ -4,6 +4,7 @@
 #include "include/cef_runnable.h"
 
 using namespace System;
+using namespace System::Threading;
 
 namespace CefSharp
 {
@@ -26,10 +27,7 @@ namespace CefSharp
 		}
 		finally
 		{
-			if (System::Threading::Interlocked::Decrement(wrapper->cbInfo->callCount) == 0)
-			{
-				wrapper->Cleanup();
-			}
+			wrapper->Release();
 		}
 	}
 
@@ -44,29 +42,23 @@ namespace CefSharp
 		this->cbInfo->context = pC.get();
 		this->cbInfo->context->AddRef();
 
-		System::Threading::Interlocked::Increment(cbInfo->callCount);
+		Retain();
 	}
 
 	CefCallbackWrapper::~CefCallbackWrapper()
 	{
 		if(!disposed && cbInfo)
-		{
-			disposed = true;
-			if (System::Threading::Interlocked::Decrement(cbInfo->callCount) == 0)
-			{
-				Cleanup();
-			}			
+		{			
+			Release();		
 		}
 	}
 
 	void CefCallbackWrapper::Call(...array<Object^> ^args)
 	{
-		if (System::Threading::Interlocked::Increment(cbInfo->callCount) <= 0)
-		{
-			throw gcnew InvalidOperationException("CefCallbackWrapper is already disposed");
-		}	
+ 		Retain();
 		
-		if(CefCurrentlyOn(TID_UI)){
+		if(CefCurrentlyOn(TID_UI))
+		{
 			_call(this, args);
 		}
 		else
@@ -75,8 +67,30 @@ namespace CefSharp
 		}
 	}
 
+	void CefCallbackWrapper::Retain()
+	{
+		if (disposed || System::Threading::Interlocked::Increment(cbInfo->callCount) <= 0)
+		{
+			throw gcnew InvalidOperationException("CefCallbackWrapper is already disposed");
+		}			
+	}
+
+	void CefCallbackWrapper::Release()
+	{				
+		int i = System::Threading::Interlocked::Decrement(cbInfo->callCount);
+		if (i < 0)
+		{	
+			throw gcnew InvalidOperationException("Too many release calls for CefCallbackWrapper");			
+		}
+		if (i == 0)
+		{
+			Cleanup();
+		}
+	}
+
 	void CefCallbackWrapper::Cleanup()
 	{
+		disposed = true;
 		cbInfo->callback->Release();
 		cbInfo->context->Release();
 		delete cbInfo;

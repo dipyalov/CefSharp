@@ -22,10 +22,10 @@ namespace WinForms
 		MCefRefPtr<ClientAdapter> _clientAdapter;
 		BrowserCore^ _browserCore;
 		MCefRefPtr<ScriptCore> _scriptCore;
+		NativeWindow^ windowInjection;
 
 		void Initialize(String^ address, BrowserSettings^ settings);
 		bool TryGetCefBrowser(CefRefPtr<CefBrowser>& browser);
-
 	protected:
 		virtual void OnHandleCreated(EventArgs^ e) override;
 		virtual void OnSizeChanged(EventArgs^ e) override;
@@ -51,11 +51,19 @@ namespace WinForms
 
 		WebView()
 		{
+			this->windowInjection = gcnew NativeWindow;
 			Initialize(String::Empty, gcnew BrowserSettings);
 		}
 
 		WebView(String^ address, BrowserSettings^ settings)
 		{
+			this->windowInjection = gcnew NativeWindow;
+			Initialize(address, settings);
+		}
+
+		WebView(String^ address, BrowserSettings^ settings, NativeWindow^ windowInjection)
+		{
+			this->windowInjection = windowInjection != nullptr ? windowInjection : gcnew NativeWindow;
 			Initialize(address, settings);
 		}
 
@@ -66,6 +74,11 @@ namespace WinForms
 			{
 				browser->CloseBrowser();
 			}	
+
+			delete windowInjection;
+
+			_clientAdapter.~MCefRefPtr();
+			_clientAdapter = nullptr;
 		}
 
 		virtual property bool IsBrowserInitialized
@@ -115,7 +128,10 @@ namespace WinForms
 		virtual property String^ TooltipText
 		{
 			String^ get() { return _browserCore->TooltipText; }
-			void set(String^ text) { _browserCore->TooltipText = text; }
+			void set(String^ text) 
+			{				
+				_browserCore->TooltipText = text; 
+			}
 		}
 
 		virtual property ILifeSpanHandler^ LifeSpanHandler
@@ -146,6 +162,11 @@ namespace WinForms
 		{
 			IKeyboardHandler^ get() { return _browserCore->KeyboardHandler; }
 			void set(IKeyboardHandler^ handler) { _browserCore->KeyboardHandler = handler; }
+		}
+		virtual property IDisplayHandler^ DisplayHandler
+		{
+			IDisplayHandler^ get() { return _browserCore->DisplayHandler; }
+			void set(IDisplayHandler^ handler) { _browserCore->DisplayHandler = handler; }
 		}
 
 		virtual void OnInitialized();

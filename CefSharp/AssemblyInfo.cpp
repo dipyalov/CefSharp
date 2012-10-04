@@ -11,7 +11,10 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyProduct("CefSharp")];
 [assembly:AssemblyCopyright("Copyright (c) Anthony Taranto 2012")];
 
-[assembly:AssemblyVersion("1.21.0.*")];
+[assembly:AssemblyVersion("1.21.0.0")];
 [assembly:ComVisible(false)];
 [assembly:CLSCompliant(true)];
 [assembly:SecurityPermission(SecurityAction::RequestMinimum, UnmanagedCode = true)];
+
+[assembly: AssemblyKeyFile("..\\CefSharp.snk")];
+[assembly: AssemblyDelaySign(false)];

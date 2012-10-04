@@ -4,9 +4,9 @@ namespace CefSharp
 	[Flags]
 	public enum class MenuInfoTypeBits
 	{
-		///
-		// No node is selected
-		///
+		///<summary>
+		///No node is selected
+		///</summary>
 		None = 0x0,
 		///
 		// The top page is selected

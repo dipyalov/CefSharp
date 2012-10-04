@@ -18,11 +18,18 @@ namespace CefSharp
 			void set(Object^ value) { this->detail = value; }
 		}
 
+		property Object^ Tag
+		{
+			Object^ get() { return this->tag; }
+			void set(Object^ value) { this->tag = value; }
+		}
+
 		event EventHandler^ EventFired;
 
 		virtual void OnEventFired();
 	private:
 		String^ name;
 		Object^ detail;
+		Object^ tag;
 	};
 }

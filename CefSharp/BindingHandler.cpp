@@ -394,6 +394,19 @@ namespace CefSharp
 					{
 						for (int i = 0; i < bestMethodArguments->Length; i++)
 						{
+							array<Object^>^ params;
+							if (bestMethodParamsMode && i == bestMethodArguments->Length - 1 && (params = dynamic_cast<array<Object^>^>(bestMethodArguments[i])) != nullptr)
+							{
+								for (int j = 0; j < params->Length; j++)
+								{
+									CefCallbackWrapper^ callback = dynamic_cast<CefCallbackWrapper^>(params[j]);
+									if(callback != nullptr)
+									{
+										callback->~CefCallbackWrapper();
+									}
+								}
+							}
+							
 							CefCallbackWrapper^ callback = dynamic_cast<CefCallbackWrapper^>(bestMethodArguments[i]);
 							if(callback != nullptr)
 							{

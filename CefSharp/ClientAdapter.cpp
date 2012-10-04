@@ -10,6 +10,7 @@
 #include "IRequestHandler.h"
 #include "IMenuHandler.h"
 #include "IKeyboardHandler.h"
+#include "IDisplayHandler.h"
 #include "HandlerErrorCode.h"
 
 namespace CefSharp
@@ -64,7 +65,14 @@ namespace CefSharp
 
     void ClientAdapter::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
     {
-        _browserControl->Title = toClr(title);
+		String^ clrtitle = toClr(title);
+        _browserControl->Title = clrtitle;
+
+		IDisplayHandler^ handler = _browserControl->DisplayHandler;
+        if (handler != nullptr)
+        {
+            handler->OnTitleChange(_browserControl, clrtitle);
+        }
     }
 
     bool ClientAdapter::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& text)
@@ -77,6 +85,11 @@ namespace CefSharp
             _browserControl->TooltipText = _tooltip;
         }
 
+		IDisplayHandler^ handler = _browserControl->DisplayHandler;
+        if (handler != nullptr)
+        {
+            return handler->OnTooltip(_browserControl, tooltip);
+        }
         return true;
     }
 

@@ -23,6 +23,11 @@ namespace WinForms
 			Object^ get() { return this->detail; }
 			void set(Object^ value) { this->detail = value; }
 		}
+		property Object^ Tag
+		{
+			Object^ get() { return this->tag; }
+			void set(Object^ value) { this->tag = value; }
+		}
 
 		event System::EventHandler^ EventCompleted;
 	internal:
@@ -30,6 +35,7 @@ namespace WinForms
 	private:
 		String^ name;
 		Object^ detail;
+		Object^ tag;
 		void OnEventFired();	
 
 		ref class CustomEvent : public ScriptCustomEvent

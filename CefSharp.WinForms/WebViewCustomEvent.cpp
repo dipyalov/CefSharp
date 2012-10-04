@@ -13,7 +13,7 @@ namespace WinForms
 	{
 		CustomEvent^ e = gcnew CustomEvent(this, control);
 		e->Name = this->Name;
-		e->Detail = this->Detail;
+		e->Detail = this->Detail;		
 		return e; 
 	}
 	
@@ -27,7 +27,7 @@ namespace WinForms
 	{
 		if (control->InvokeRequired)
 		{
-			control->Invoke(gcnew MethodInvoker(parent, &WebViewCustomEvent::OnEventFired));
+			control->BeginInvoke(gcnew MethodInvoker(parent, &WebViewCustomEvent::OnEventFired));
 			return;
 		}
 		parent->OnEventFired();

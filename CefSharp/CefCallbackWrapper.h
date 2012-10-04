@@ -17,10 +17,12 @@ namespace CefSharp
 		~CefCallbackWrapper();
 		
 		void Call(...array<Object^> ^args);
+		void Retain();
+		void Release();
 	internal:
 		CEF_CALLBACK_INFO *cbInfo;
 		void Cleanup();	
 	private:
-		bool disposed;
+		volatile bool disposed;		
 	};
 }
